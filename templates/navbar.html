@@ -1,0 +1,31 @@
+<div class="navbar">
+    <div class="nav-left">
+        <img src={{ url_for('static', filename='images/logo.png') }} style="height: 50px; width: 50px;">
+        <h2>SkillNet</h2>
+        <a href="/feed" class="nav-link {% if active_page == 'feed' %} active {%endif%}">Feed</a>
+        <a href="/search" class="nav-link {% if active_page == 'search' %} active {%endif%}">Search</a>
+    </div>
+
+    <div class="nav-right">
+
+        {% if session.get("user") %}
+
+        <div class="user-info">
+            <span class="student-name">{{session.user.fullname}}</span>
+            <span class="student-email">{{session.user.email}}</span>
+        </div>
+
+        <img 
+        src="{{ session.user.profileUrl }}" 
+        class="profile-img"
+        onerror="this.onerror=null; this.src=`{{ url_for('static', filename='images/user.png') }}`"
+        >
+
+        <a href="/profile/{{session.user.username}}" class="profile-link {% if active_page == 'profile' %} active {%endif%}">Profile</a>
+
+        <button class="logout-btn" onclick="logoutUser()">Logout</button>
+
+        {% endif %}
+
+    </div>
+</div>

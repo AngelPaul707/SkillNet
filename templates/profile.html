@@ -1,0 +1,554 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+
+.profile-page{
+max-width:1000px;
+margin:auto;
+padding:30px;
+font-family:system-ui;
+}
+
+/* HEADER */
+
+.profile-header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:30px;
+margin-bottom:35px;
+}
+
+/* LEFT SIDE */
+
+.profile-left{
+display:flex;
+gap:25px;
+}
+
+.profile-avatar img{
+width:120px;
+height:120px;
+border-radius:50%;
+object-fit:cover;
+border:4px solid #f1f1f1;
+}
+
+.profile-main strong{
+font-size:22px;
+}
+
+.username{
+color:#777;
+font-size:14px;
+}
+
+.profile-meta{
+color:#666;
+font-size:14px;
+margin-top:4px;
+}
+
+.profile-bio{
+margin-top:10px;
+color:#444;
+max-width:500px;
+}
+
+/* SKILLS */
+
+.skills{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-top:12px;
+}
+
+.skill-pill{
+background:#eef2ff;
+border:1px solid #c7d2fe;
+padding:5px 10px;
+border-radius:16px;
+font-size:12px;
+}
+
+/* RIGHT SIDE */
+
+.profile-right{
+text-align:right;
+}
+
+.profile-stats{
+display:flex;
+gap:22px;
+margin-bottom:10px;
+}
+
+.profile-stats div{
+text-align:center;
+font-size:13px;
+}
+
+.profile-stats strong{
+font-size:18px;
+display:block;
+}
+
+/* ACTIONS */
+
+.profile-actions{
+display:flex;
+justify-content:flex-end;
+gap:10px;
+margin-top:10px;
+}
+
+.btn{
+padding:7px 14px;
+border-radius:7px;
+border:none;
+cursor:pointer;
+font-size:13px;
+}
+
+.follow-btn{
+background:#2563eb;
+color:white;
+}
+
+.edit-btn{
+background:#eee;
+}
+
+.icon-btn{
+background:#f1f1f1;
+border-radius:8px;
+padding:8px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.icon-btn svg{
+width:18px;
+height:18px;
+}
+
+/* TABS */
+
+.profile-tabs{
+display:flex;
+justify-content:center;
+gap:40px;
+border-top:1px solid #ddd;
+margin-top:30px;
+}
+
+.tab{
+padding:15px;
+cursor:pointer;
+color:#888;
+}
+
+.tab.active{
+color:black;
+border-top:2px solid black;
+}
+
+/* GRID */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+gap:14px;
+margin-top:20px;
+}
+
+.post-card{
+cursor:pointer;
+overflow:hidden;
+border-radius:10px;
+}
+
+.post-card img{
+width:100%;
+height:250px;
+object-fit:cover;
+transition:.3s;
+}
+
+.post-card:hover img{
+transform:scale(1.05);
+}
+
+.project-card{
+border:1px solid #eee;
+padding:16px;
+border-radius:10px;
+background:white;
+cursor:pointer;
+}
+
+.project-links{
+margin-top:8px;
+display:flex;
+gap:10px;
+font-size:13px;
+}
+
+.loading{
+text-align:center;
+padding:40px;
+color:#888;
+}
+
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="profile-page">
+
+<div class="profile-header">
+
+<!-- LEFT -->
+
+<div class="profile-left">
+
+<div class="profile-avatar">
+<img id="profileAvatar">
+</div>
+
+<div class="profile-main">
+
+<strong id="fullname"></strong>
+
+<div class="username">@<span id="username"></span></div>
+
+<div class="profile-meta">
+<span id="institution"></span>
+<span id="location"></span>
+</div>
+
+<div id="bioText" class="profile-bio"></div>
+
+<div id="skills" class="skills"></div>
+
+</div>
+
+</div>
+
+
+<!-- RIGHT -->
+
+<div class="profile-right">
+
+<div class="profile-stats">
+
+<div>
+<strong id="postCount">0</strong>
+Posts
+</div>
+
+<div>
+<strong id="followersCount">0</strong>
+Followers
+</div>
+
+<div>
+<strong id="followingCount">0</strong>
+Following
+</div>
+
+<div>
+<strong id="projectCount">0</strong>
+Projects
+</div>
+
+</div>
+
+
+<div class="profile-actions">
+
+<button id="followBtn" class="btn follow-btn" style="display:none">
+Follow
+</button>
+
+<a href="/profile/edit">
+<button id="editBtn" class="btn edit-btn" style="display:none">
+Edit Profile
+</button>
+</a>
+
+<div class="btn" onclick="location.href='/post/create'" style="background-color: rgb(202, 203, 195); display: none;" id="cpost">
+    Create post
+</div>
+
+<div class="btn" onclick="location.href='/project/create'" style="background-color: rgb(135, 188, 234); display: none;" id="cproj" >
+    Publish project
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="profile-tabs">
+
+<div class="tab active" onclick="showTab(event,'posts')">
+Posts
+</div>
+
+<div class="tab" onclick="showTab(event,'projects')">
+Projects
+</div>
+
+</div>
+
+
+
+<div id="posts">
+<div class="grid" id="postsGrid">
+<div class="loading">Loading posts...</div>
+</div>
+</div>
+
+
+
+<div id="projects" style="display:none">
+<div class="grid" id="projectsGrid">
+<div class="loading">Loading projects...</div>
+</div>
+</div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block js %}
+
+<script>
+
+async function loadProfileData(){
+
+const path = window.location.pathname
+
+let url = "/api/profile-data"
+
+/* check if url is /profile/<username> */
+
+const parts = path.split("/")
+
+if(parts.length === 3 && parts[2]){
+    url += "?username=" + parts[2]
+}
+
+const res = await fetch(url)
+const data = await res.json()
+
+const user = data.user
+
+/* USER */
+
+fullname.innerText = user.full_name
+username.innerText = user.username
+bioText.innerText = user.bio || "No bio yet"
+
+institution.innerText = user.institution || ""
+location.innerText = user.location || ""
+
+profileAvatar.src = user.profile_pic || "/static/images/user.png"
+
+
+/* SKILLS */
+
+skills.innerHTML = ""
+
+data.skills.forEach(s=>{
+skills.innerHTML += `<div class="skill-pill">${s.skill_name}</div>`
+})
+
+
+/* STATS */
+
+postCount.innerText = data.stats.posts
+projectCount.innerText = data.stats.projects
+followersCount.innerText = data.stats.followers
+followingCount.innerText = data.stats.following
+
+
+/* SELF PROFILE CHECK */
+
+if(data.is_self){
+
+editBtn.style.display = "inline-block"
+cpost.style.display="inline-block"
+cproj.style.display="inline-block"
+
+}else{
+
+followBtn.style.display = "inline-block"
+
+if(data.following){
+followBtn.innerText="Following"
+followBtn.style.background="#e5e7eb"
+followBtn.style.color="#111"
+}else{
+followBtn.innerText="Follow"
+followBtn.style.background="#2563eb"
+followBtn.style.color="white"
+}
+
+followBtn.onclick = () => toggleFollow(data.user.student_id)
+
+}
+
+/* POSTS + PROJECTS */
+
+renderPosts(data.posts)
+renderProjects(data.projects)
+
+}
+
+
+
+function renderPosts(posts){
+
+const grid = document.getElementById("postsGrid")
+
+grid.innerHTML = ""
+
+if(posts.length===0){
+grid.innerHTML="<div class='loading'>No posts yet</div>"
+return
+}
+
+posts.forEach(p=>{
+
+grid.innerHTML += `
+<div class="post-card"
+onclick="openPost(${p.post_id})">
+
+<img src="${p.image_url}" loading="lazy">
+
+</div>
+`
+
+})
+
+}
+
+
+
+function renderProjects(projects){
+
+const grid = document.getElementById("projectsGrid")
+
+grid.innerHTML=""
+
+if(projects.length===0){
+grid.innerHTML="<div class='loading'>No projects yet</div>"
+return
+}
+
+projects.forEach(p=>{
+
+grid.innerHTML += `
+<div class="project-card"
+onclick="openProject(${p.project_id})">
+
+<h4>${p.title}</h4>
+
+<p>${p.description || ""}</p>
+
+<div class="project-links">
+
+${p.github_url ? `<a href="${p.github_url}" target="_blank">Github</a>`:""}
+
+${p.demo_url ? `<a href="${p.demo_url}" target="_blank">Demo</a>`:""}
+
+</div>
+
+</div>
+`
+
+})
+
+}
+
+
+
+/* NAVIGATION */
+
+function openPost(id){
+window.location.href="/post/"+id
+}
+
+function openProject(id){
+window.location.href="/project/"+id
+}
+
+
+
+/* TABS */
+
+function showTab(e,id){
+
+document.querySelectorAll(".tab")
+.forEach(t=>t.classList.remove("active"))
+
+e.target.classList.add("active")
+
+posts.style.display = id==="posts" ? "block":"none"
+projects.style.display = id==="projects" ? "block":"none"
+
+}
+
+async function toggleFollow(userId){
+
+const res = await fetch("/api/follow",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+user_id:userId
+})
+})
+
+const data = await res.json()
+
+if(data.following){
+
+followBtn.innerText="Following"
+followBtn.style.background="#e5e7eb"
+followBtn.style.color="#111"
+
+followersCount.innerText =
+parseInt(followersCount.innerText)+1
+
+}else{
+
+followBtn.innerText="Follow"
+followBtn.style.background="#2563eb"
+followBtn.style.color="white"
+
+followersCount.innerText =
+parseInt(followersCount.innerText)-1
+
+}
+}
+loadProfileData()
+
+</script>
+
+{% endblock %}

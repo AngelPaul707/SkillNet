@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=zaQŒ, initial-scale=1.0">
+    <title>{% block title %}SkillNet {% endblock%}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+    {%block css %} {%endblock%} 
+
+<body>
+    {% include 'navbar.html' %}
+
+     <main>
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+    <script>
+
+            async function logoutUser(){
+
+            if(!confirm("Are you sure you want to logout?")) return
+
+            try{
+
+            const res = await fetch("/logout",{
+            method:"POST"
+            })
+
+            if(res.ok){
+            window.location="/login"
+            }
+
+            }catch(e){
+            window.location="/login"
+            }
+
+            }
+    </script>
+
+    {%block js %} {%endblock%}
+</html>

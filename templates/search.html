@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+
+.search-container{
+max-width:900px;
+margin:auto;
+padding:30px;
+}
+
+.search-box{
+display:flex;
+gap:10px;
+margin-bottom:30px;
+}
+
+.search-box input{
+flex:1;
+padding:12px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+.search-box button{
+padding:10px 16px;
+border:none;
+background:#111;
+color:white;
+border-radius:8px;
+cursor:pointer;
+}
+
+.results{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+gap:20px;
+}
+
+.student-card{
+background:white;
+border:1px solid #eee;
+border-radius:10px;
+padding:18px;
+text-align:center;
+cursor:pointer;
+transition:.2s;
+}
+
+.student-card:hover{
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+.student-card img{
+width:70px;
+height:70px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:10px;
+}
+
+.skills{
+margin-top:8px;
+display:flex;
+flex-wrap:wrap;
+gap:5px;
+justify-content:center;
+}
+
+.skills span{
+background:#f3f4f6;
+padding:4px 8px;
+border-radius:14px;
+font-size:11px;
+}
+
+.meta{
+font-size:12px;
+color:#666;
+margin-top:3px;
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="search-container">
+
+<div class="search-box">
+<input id="searchInput" type="text"
+placeholder="Search students by name, skill, or username...">
+</div>
+
+<div id="results" class="results"></div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block js %}
+
+<script>
+
+const input = document.getElementById("searchInput")
+const results = document.getElementById("results")
+
+let timer = null
+
+input.addEventListener("input",()=>{
+
+clearTimeout(timer)
+
+const query = input.value.trim()
+
+if(query.length < 2){
+results.innerHTML=""
+return
+}
+
+timer = setTimeout(()=>search(query),300)
+
+})
+
+
+async function search(query){
+
+const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
+const data = await res.json()
+
+renderResults(data.results)
+
+}
+
+
+function renderResults(users){
+
+results.innerHTML=""
+
+if(users.length === 0){
+results.innerHTML="<p>No users found</p>"
+return
+}
+
+users.forEach(u=>{
+
+results.innerHTML += `
+<div class="student-card"
+onclick="openProfile('${u.username}')">
+
+<img src="${u.avatar || '/static/images/user.png'}">
+
+<h4>${u.full_name}</h4>
+
+<div class="meta">@${u.username}</div>
+
+<div class="meta">${u.institution || ""} ${u.location ? " • "+u.location : ""}</div>
+
+<div class="skills">
+
+${u.skills
+    .split(',')
+    .slice(0,4)
+    .map(s=>`<span>${s.trim()}</span>`)
+    .join("")}
+
+</div>
+
+</div>
+`
+
+})
+
+}
+
+
+function openProfile(username){
+window.location.href = "/profile/" + username
+}
+
+</script>
+
+{% endblock %}
